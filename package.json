@@ -1,0 +1,33 @@
+{
+  "name": "eleventy-plugin-hubspot",
+  "version": "1.0.0",
+  "description": "Capture, organize and engage web visitors with free live chat, forms, CRM (contact management), email marketing, and analytics.",
+  "main": ".eleventy.js",
+  "scripts": {
+    "build": "cd demo/; npx eleventy",
+    "dev": "cd demo/; npx eleventy --serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reatlat/eleventy-plugin-hubspot.git"
+  },
+  "keywords": [
+    "eleventy",
+    "eleventy-plugin",
+    "11ty",
+    "hubspot"
+  ],
+  "author": {
+    "name": "Alex Zappa",
+    "email": "alex@zappa.dev",
+    "url": "https://alex.zappa.dev/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/reatlat/eleventy-plugin-hubspot/issues"
+  },
+  "homepage": "https://github.com/reatlat/eleventy-plugin-hubspot#readme",
+  "dependencies": {
+    "@11ty/eleventy": "^1.0.1"
+  }
+}

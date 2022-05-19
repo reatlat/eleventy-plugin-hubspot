@@ -1,0 +1,5 @@
+# 11ty site output
+demo/
+_site/
+# misc
+.eleventyignore

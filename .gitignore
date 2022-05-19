@@ -1,0 +1,14 @@
+# Eleventy Site Output
+_site
+
+# node modules
+node_modules
+
+# npm rc
+.npmrc
+
+# DS Store
+.DS_STORE
+
+# IDE
+.idea
