@@ -1,0 +1,51 @@
+---
+
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>11ty Plugin HubSpot - Demo</title>
+    <link rel="stylesheet"
+          href="https://unpkg.com/purecss@2.1.0/build/pure-min.css"
+          integrity="sha384-yHIFVG6ClnONEA5yB5DJXfW2/KC173DIQrYoZMEtBvGzmf0PKiGyNEqe9N6BNDBH"
+          crossorigin="anonymous">
+    <style>
+        body {
+            background: #fafafa;
+        }
+        .page-wrapper {
+            background: #fff;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,.15);
+        }
+        fieldset {
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="page page-wrapper">
+
+        <div class="content-wrapper">
+            <div class="content">
+                <div class="pure-g">
+                    <div class="pure-u-1-1">
+
+                        {% hubspotForm "6047c911-ee99-4cf6-942b-b42db681f005", {
+                            locale: "es"
+                        } %}
+
+                        {# TODO findout how to pass event callback functions like onBeforeFormInit #}
+
+                        {% hubspotMeetings "https://meetings.hubspot.com/alex-zappa" %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
