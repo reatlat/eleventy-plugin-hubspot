@@ -1,11 +1,12 @@
 {
   "name": "eleventy-plugin-hubspot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Capture, organize and engage web visitors with free live chat, forms, CRM (contact management), email marketing, and analytics.",
   "main": ".eleventy.js",
   "scripts": {
     "build": "cd demo/; npx eleventy",
-    "dev": "cd demo/; npx eleventy --serve"
+    "dev": "cd demo/; npx eleventy --serve",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",

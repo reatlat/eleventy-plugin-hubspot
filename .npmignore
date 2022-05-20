@@ -3,3 +3,4 @@ demo/
 _site/
 # misc
 .eleventyignore
+.idea
