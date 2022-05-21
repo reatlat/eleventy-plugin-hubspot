@@ -1,11 +1,15 @@
 # eleventy-plugin-hubspot
+[![npm](https://img.shields.io/npm/v/eleventy-plugin-hubspot.svg)](https://npmjs.com/package/eleventy-plugin-hubspot)
+[![npm](https://img.shields.io/npm/dt/eleventy-plugin-hubspot.svg)](https://npmjs.com/package/eleventy-plugin-hubspot)
+[![license](https://img.shields.io/npm/l/eleventy-plugin-hubspot.svg)](https://npmjs.com/package/eleventy-plugin-hubspot)
+
 An Eleventy [shortcode](https://www.11ty.dev/docs/shortcodes/) that generates HubSpot forms or Meetings Calendar.
 
 ## Installation
 Install the plugin from [npm](https://www.npmjs.com/package/eleventy-plugin-hubspot):
 
 ```
-npm install eleventy-plugin-hubspot
+npm install eleventy-plugin-hubspot --save-dev
 ```
 
 
