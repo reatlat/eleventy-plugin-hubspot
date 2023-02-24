@@ -29,6 +29,6 @@
   },
   "homepage": "https://github.com/reatlat/eleventy-plugin-hubspot#readme",
   "dependencies": {
-    "@11ty/eleventy": "^1.0.1"
+    "@11ty/eleventy": "^1.0.2"
   }
 }
