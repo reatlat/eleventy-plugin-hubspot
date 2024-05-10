@@ -26,19 +26,30 @@ module.exports = (eleventyConfig, options = {}) => {
                 "[eleventy-plugin-hubspot] the formId of hubspotForm must be specified"
             );
         }
-
+        
         /**
          * How to customize the form embed code
          * @link https://legacydocs.hubspot.com/docs/methods/forms/advanced_form_options
          */
+        
         const config = { ...options, ...{ formId: formId }, ...args };
+        const configData = encodeURIComponent(JSON.stringify(config));
 
         return `
-          <!--[if lte IE 8]>
-          <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2-legacy.js"></script>
-          <![endif]-->
-          <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2.js"></script>
-          <script data-hubspot-rendered="true">hbspt.forms.create(${JSON.stringify(config)});</script>
+            <div class="hubspot-form" data-config="${configData}" hidden></div>
+            <!--[if lte IE 8]>
+            <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2-legacy.js"></script>
+            <![endif]-->
+            <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2.js"></script>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var forms = document.querySelectorAll('.hubspot-form');
+                forms.forEach(function(form) {
+                    var config = JSON.parse(decodeURIComponent(form.getAttribute('data-config')));
+                    hbspt.forms.create(config);
+                });
+            });
+            </script>
         `;
     });
 
