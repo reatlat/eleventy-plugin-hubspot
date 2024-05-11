@@ -17,7 +17,7 @@ module.exports = (eleventyConfig, options = {}) => {
             "i"
         ); // fragment locator
 
-        return !!pattern.test(str);
+        return pattern.test(str);
     };
 
     eleventyConfig.addShortcode("hubspotForm", (formId, args = {}) => {
@@ -32,15 +32,15 @@ module.exports = (eleventyConfig, options = {}) => {
          * @link https://legacydocs.hubspot.com/docs/methods/forms/advanced_form_options
          */
 
-        const config = { ...options, ...{ formId: formId }, ...args };
-        const configData = encodeURIComponent(JSON.stringify(config));
+        const config = { ...options, formId, ...args };
+        const encodedConfig = encodeURIComponent(JSON.stringify(config));
 
         return `
             <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
             <script>
                 (function(config){
                     hbspt.forms.create(JSON.parse(decodeURIComponent(config)))
-                })('${configData}')
+                })('${encodedConfig}')
             </script>
         `;
     });
