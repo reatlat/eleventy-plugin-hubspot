@@ -6,8 +6,11 @@ module.exports = function (eleventyConfig) {
      * @link https://legacydocs.hubspot.com/docs/methods/forms/advanced_form_options
      */
     eleventyConfig.addPlugin(eleventyPluginHubspot, {
-        portalId: 8768191,
+        region: "na1",
+        portalId: "45442241",
         locale: "en",
+        loadingMode: "eager",
+        // loadingMode: "lazy",
         //cssRequired: "",
         //cssClass: "",
         translations: {
