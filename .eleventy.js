@@ -38,10 +38,9 @@ module.exports = (eleventyConfig, options = {}) => {
         return `
             <script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
             <script>
-                ((config) => {
-                    config = JSON.parse(decodeURIComponent(config))
-                    hbspt.forms.create(config);
-                })("${configData}");
+                (function(config){
+                    hbspt.forms.create(JSON.parse(decodeURIComponent(config)))
+                })('${configData}')
             </script>
         `;
     });
