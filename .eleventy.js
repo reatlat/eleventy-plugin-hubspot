@@ -22,15 +22,15 @@ module.exports = (eleventyConfig, options = {}) => {
     if (!loadingMode) {
         loadingMode = "default";
         console.info(
-            "[eleventy-plugin-hubspot] the loadingMode is not set, defaulting to 'default'.\nYou can set it to 'lazy' or 'eager' to enable lazy loading feature,\ncheck the documentation for more details https://github.com/reatlat/eleventy-plugin-hubspot#custom-usage\n"
+            "[eleventy-plugin-hubspot] the loadingMode is not set, defaulting to 'default'.\nYou can set it to 'lazy', 'eager', or 'interact' to enable lazy loading feature,\ncheck the documentation for more details https://github.com/reatlat/eleventy-plugin-hubspot#custom-usage\n"
         );
     }
 
     delete options.loadingMode;
 
-    if (!["default", "lazy", "eager"].includes(loadingMode)) {
+    if (!["default", "lazy", "eager", "interact"].includes(loadingMode)) {
         throw new Error(
-            `[eleventy-plugin-hubspot] the loadingMode must be one of 'default', 'lazy', 'eager'`
+            `[eleventy-plugin-hubspot] the loadingMode must be one of 'default', 'lazy', 'eager', 'interact'`
         );
     }
 
@@ -95,6 +95,48 @@ module.exports = (eleventyConfig, options = {}) => {
         </script>`;
     }
 
+    const interactLoadingCode = (encodedConfig, options, hsScripts) => {
+        return `<script type="text/javascript">
+        /*<![CDATA[|*/
+        (function(w, cb){
+            cb = function(e) {
+                if (e.data === "hsFormsEmbedLoaded") {
+                    w.removeEventListener("message", cb);
+                    hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
+                }
+            };
+            w.addEventListener("message", cb);
+        })(window);
+        ((w, f) => {
+            const e = ["keypress", "click", "scroll", "mousemove", "touchstart"];
+            e.forEach((en) => {
+                w.addEventListener(en, function() {
+                    if (!f) {
+                        f = true;
+                        postMessage("user_first_interaction");
+                        let i = "hs-script-${hsScripts.forms.id}";
+                        let s = "${hsScripts.forms.src}";
+                        if (!document.getElementById(i)) {
+                            const se = document.createElement("script");
+                            se.id = i;
+                            se.src = s;
+                            se.defer = true;
+                            se.onload = se.onreadystatechange = function() {
+                                if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
+                                    se.onload = se.onreadystatechange = null;
+                                    postMessage('hsFormsEmbedLoaded');
+                                }
+                            };
+                            document.body.appendChild(se);
+                        }
+                    }
+                },{once: true});
+            })
+        })(window, false);
+        /*]]>*/
+        </script>`;
+    }
+
     const eagerLoadingCode = (encodedConfig, hsScripts) => {
         return `<script type="text/javascript">
         /*<![CDATA[|*/
@@ -135,7 +177,7 @@ module.exports = (eleventyConfig, options = {}) => {
 
         let hubspotFormCode = ``;
 
-        if (['eager', 'lazy'].includes(loadingMode) && !args.target) {
+        if (['eager', 'lazy', 'interact'].includes(loadingMode) && !args.target) {
             options.target = `#form-wrapper-${uuid}`;
             hubspotFormCode += `<div id="form-wrapper-${uuid}"></div>`;
         }
@@ -147,6 +189,8 @@ module.exports = (eleventyConfig, options = {}) => {
             hubspotFormCode += lazyLoadingCode(encodedConfig, options, hsScripts);
         } else if (loadingMode === "eager") {
             hubspotFormCode += eagerLoadingCode(encodedConfig, hsScripts);
+        } else if (loadingMode === "interact") {
+            hubspotFormCode += interactLoadingCode(encodedConfig, options, hsScripts);
         } else {
             hubspotFormCode = `<script charset="utf-8" type="text/javascript" src="${hsScripts.forms.src}"></script><script type="text/javascript">/*<![CDATA[|*/hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')))/*]]>*/</script>`;
         }
