@@ -34,6 +34,14 @@ module.exports = (eleventyConfig, options = {}) => {
         );
     }
 
+    const minifyCode = (code) => {
+        return code
+            .split('\n') // split on new line
+            .map(line => line.trim()) // remove leading/trailing white space
+            .filter(line => line.length && !line.startsWith('//')) // remove empty lines & single line comments
+            .join(''); // join back to a single string
+    }
+
     const validURL = (str) => {
         const pattern = new RegExp(
             "^(https?:\\/\\/)?" + // protocol
@@ -48,38 +56,37 @@ module.exports = (eleventyConfig, options = {}) => {
         return pattern.test(str);
     };
 
-    function lazyLoadingCode(encodedConfig, options, hsScripts) {
+    const lazyLoadingCode = (encodedConfig, options, hsScripts) => {
         return `<script type="text/javascript">
         /*<![CDATA[|*/
-        (function(window, callback){
-            callback = function(messageEvent) {
-                if (messageEvent.data === "hsFormsEmbedLoaded") {
-                    window.removeEventListener("message", callback);
+        (function(w, cb){
+            cb = function(e) {
+                if (e.data === "hsFormsEmbedLoaded") {
+                    w.removeEventListener("message", cb);
                     hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
                 }
-            }
-            window.addEventListener("message", callback);
+            };
+            w.addEventListener("message", cb);
         })(window);
-        (function(w,d,options, callback, observer, target) {
-            observer = new IntersectionObserver(callback, options);
+        (function(w,d,o,cb,observer,target) {
+            observer = new IntersectionObserver(cb, o);
             target = d.querySelector('${options.target}');
             observer.observe(target);
         })(window, document, {threshold:0.1}, function(entries, observer) {
             if (entries[0].isIntersecting) {
                 let scriptID = "hs-script-${hsScripts.forms.id}";
-                let scriptSrc = "${hsScripts.forms.src}";
                 if (!document.getElementById(scriptID)) {
-                    const scriptElement = document.createElement("script");
-                    scriptElement.id = scriptID;
-                    scriptElement.src = scriptSrc;
-                    scriptElement.defer = true;
-                    scriptElement.onload = scriptElement.onreadystatechange = function() {
+                    const s = document.createElement("script");
+                    s.id = scriptID;
+                    s.src = "${hsScripts.forms.src}";
+                    s.defer = true;
+                    s.onload = s.onreadystatechange = function() {
                         if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
-                            scriptElement.onload = scriptElement.onreadystatechange = null;
+                            s.onload = s.onreadystatechange = null;
                             postMessage('hsFormsEmbedLoaded');
                         }
                     };
-                    document.body.appendChild(scriptElement);
+                    document.body.appendChild(s);
                 }
                 observer.disconnect()
             }
@@ -88,31 +95,31 @@ module.exports = (eleventyConfig, options = {}) => {
         </script>`;
     }
 
-    function eagerLoadingCode(encodedConfig, hsScripts) {
+    const eagerLoadingCode = (encodedConfig, hsScripts) => {
         return `<script type="text/javascript">
         /*<![CDATA[|*/
-        window.addEventListener("message", function(messageEvent) {
-            if (messageEvent.data === "hsFormsEmbedLoaded") {
+        window.addEventListener("message", function(e) {
+            if (e.data === "hsFormsEmbedLoaded") {
                 hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
             }
         }, {once: true});
-        (function(window, document, scriptID, scriptSrc, scriptElement) {
-            window.addEventListener("DOMContentLoaded", function() {
-                if (!document.getElementById(scriptID)) {
-                    scriptElement = document.createElement("script");
-                    scriptElement.id = scriptID;
-                    scriptElement.src = scriptSrc;
-                    scriptElement.defer = true;
-                    scriptElement.onload = scriptElement.onreadystatechange = function() {
+        (function(w,d,id,s) {
+            w.addEventListener("DOMContentLoaded", function() {
+                if (!d.getElementById(id)) {
+                    s = d.createElement("script");
+                    s.id = id;
+                    s.src = "${hsScripts.forms.src}";
+                    s.defer = true;
+                    s.onload = s.onreadystatechange = function() {
                         if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
                             postMessage("hsFormsEmbedLoaded");
-                            scriptElement.onload = scriptElement.onreadystatechange = null;
+                            s.onload = s.onreadystatechange = null;
                         }
                     };
-                    document.body.appendChild(scriptElement);
+                    d.body.appendChild(s);
                 }
             });
-        })(window, document, "hs-script-${hsScripts.forms.id}", "${hsScripts.forms.src}");
+        })(window, document, "hs-script-${hsScripts.forms.id}");
         /*]]>*/
         </script>`;
     }
@@ -144,7 +151,7 @@ module.exports = (eleventyConfig, options = {}) => {
             hubspotFormCode = `<script charset="utf-8" type="text/javascript" src="${hsScripts.forms.src}"></script><script type="text/javascript">/*<![CDATA[|*/hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')))/*]]>*/</script>`;
         }
 
-        return hubspotFormCode.replace(/\n/g, '').trim();
+        return minifyCode(hubspotFormCode);
     });
 
     eleventyConfig.addShortcode("hubspotMeetings", (url) => {
@@ -160,9 +167,9 @@ module.exports = (eleventyConfig, options = {}) => {
             );
         }
 
-        return `
+        return minifyCode(`
             <div class="meetings-iframe-container" data-src="${url.split('?')[0]}?embed=true"></div>
             <script id="hs-script-${hsScripts.meetings.id}" charset="utf-8" type="text/javascript" src="${hsScripts.meetings.src}"></script>
-        `;
+        `);
     });
 };
