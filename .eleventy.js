@@ -1,6 +1,5 @@
 /* global hbspt */
 module.exports = (eleventyConfig, options = {}) => {
-
     const hsScripts = {
         forms: {
             id: crypto.randomUUID(),
@@ -14,13 +13,12 @@ module.exports = (eleventyConfig, options = {}) => {
 
     if (!options.portalId) {
         throw new Error(
-            "[eleventy-plugin-hubspot] the portalId must be specified in plugin options"
+            `[eleventy-plugin-hubspot] the portalId must be specified in plugin options`
         );
     }
 
     let loadingMode = options.loadingMode || null;
 
-    // if no value set default to default
     if (!loadingMode) {
         loadingMode = "default";
         console.info(
@@ -32,7 +30,7 @@ module.exports = (eleventyConfig, options = {}) => {
 
     if (!["default", "lazy", "eager"].includes(loadingMode)) {
         throw new Error(
-            "[eleventy-plugin-hubspot] the loadingMode must be one of 'default', 'lazy', 'eager'"
+            `[eleventy-plugin-hubspot] the loadingMode must be one of 'default', 'lazy', 'eager'`
         );
     }
 
@@ -50,42 +48,9 @@ module.exports = (eleventyConfig, options = {}) => {
         return pattern.test(str);
     };
 
-    eleventyConfig.addShortcode("hubspotForm", (formId, args = {}) => {
-        if (!formId) {
-            throw new Error(
-                "[eleventy-plugin-hubspot] the formId of hubspotForm must be specified"
-            );
-        }
-
-        if (options.loadingMode) {
-            loadingMode = options.loadingMode;
-            delete options.loadingMode;
-            if (!["default", "lazy", "eager"].includes(loadingMode)) {
-                throw new Error(
-                    "[eleventy-plugin-hubspot] the loadingMode must be one of 'default', 'lazy', 'eager'"
-                );
-            }
-        }
-
-        /**
-         * How to customize the form embed code
-         * @link https://legacydocs.hubspot.com/docs/methods/forms/advanced_form_options
-         */
-
-        const uuid = crypto.randomUUID();
-
-        let _return = ``;
-
-        if (['eager', 'lazy'].includes(loadingMode) && !args.target) {
-            options.target = `#form-wrapper-${uuid}`;
-            _return += `<div id="form-wrapper-${uuid}"></div>`;
-        }
-
-        const config = { ...options, formId, ...args };
-        const encodedConfig = encodeURIComponent(JSON.stringify(config));
-
-
-        /* Lazy loading ****************************************************************************************
+    function lazyLoadingCode(encodedConfig, options, hsScripts) {
+        return `<script type="text/javascript">
+        /*<![CDATA[|*/
         (function(window, callback){
             callback = function(messageEvent) {
                 if (messageEvent.data === "hsFormsEmbedLoaded") {
@@ -119,14 +84,13 @@ module.exports = (eleventyConfig, options = {}) => {
                 observer.disconnect()
             }
         });
-        */
+        /*]]>*/
+        </script>`;
+    }
 
-        if (loadingMode === "lazy") {
-            _return += `<script type="text/javascript">/*<![CDATA[|*/(function(s,t){t=function(n){n.data==="hsFormsEmbedLoaded"&&(s.removeEventListener("message",t),hbspt.forms.create(JSON.parse(decodeURIComponent("${encodedConfig}"))))},s.addEventListener("message",t)})(window),function(s,t,n,o,e,d){e=new IntersectionObserver(o,n),d=t.querySelector("${options.target}"),e.observe(d)}(window,document,{threshold:.1},function(s,t){if(s[0].isIntersecting){let n="hs-script-${hsScripts.forms.id}",o="${hsScripts.forms.src}";if(!document.getElementById(n)){const e=document.createElement("script");e.id=n,e.src=o,e.defer=!0,e.onload=e.onreadystatechange=function(){(!this.readyState||this.readyState==="loaded"||this.readyState==="complete")&&(e.onload=e.onreadystatechange=null,postMessage("hsFormsEmbedLoaded"))},document.body.appendChild(e)}t.disconnect()}});/*]]>*/</script>`;
-            return _return.replace(/\n/g, '').trim();
-        }
-
-        /* Eager loading ****************************************************************************************
+    function eagerLoadingCode(encodedConfig, hsScripts) {
+        return `<script type="text/javascript">
+        /*<![CDATA[|*/
         window.addEventListener("message", function(messageEvent) {
             if (messageEvent.data === "hsFormsEmbedLoaded") {
                 hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
@@ -149,23 +113,44 @@ module.exports = (eleventyConfig, options = {}) => {
                 }
             });
         })(window, document, "hs-script-${hsScripts.forms.id}", "${hsScripts.forms.src}");
-        */
+        /*]]>*/
+        </script>`;
+    }
 
-        if (loadingMode === "eager") {
-            _return += `<script type="text/javascript">/*<![CDATA[|*/window.addEventListener("message",function(d){d.data==="hsFormsEmbedLoaded"&&hbspt.forms.create(JSON.parse(decodeURIComponent("${encodedConfig}")))},{once:!0}),function(d,o,a,n,e){d.addEventListener("DOMContentLoaded",function(){o.getElementById(a)||(e=o.createElement("script"),e.id=a,e.src=n,e.defer=!0,e.onload=e.onreadystatechange=function(){(!this.readyState||this.readyState==="loaded"||this.readyState==="complete")&&(postMessage("hsFormsEmbedLoaded"),e.onload=e.onreadystatechange=null)},o.body.appendChild(e))})}(window,document,"hs-script-${hsScripts.forms.id}","${hsScripts.forms.src}");/*]]>*/</script>`;
-            return _return.replace(/\n/g, '').trim();
+    eleventyConfig.addShortcode("hubspotForm", (formId, args = {}) => {
+        if (!formId) {
+            throw new Error(
+                `[eleventy-plugin-hubspot] the formId of hubspotForm must be specified`
+            );
         }
 
-        _return = `<script charset="utf-8" type="text/javascript" src="${hsScripts.forms.src}"></script><script type="text/javascript">/*<![CDATA[|*/hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')))/*]]>*/</script>`;
+        const uuid = crypto.randomUUID();
 
-        // always remove new lines and trim the string before returning
-        return _return.replace(/\n/g, '').trim();
+        let hubspotFormCode = ``;
+
+        if (['eager', 'lazy'].includes(loadingMode) && !args.target) {
+            options.target = `#form-wrapper-${uuid}`;
+            hubspotFormCode += `<div id="form-wrapper-${uuid}"></div>`;
+        }
+
+        const config = { ...options, formId, ...args };
+        const encodedConfig = encodeURIComponent(JSON.stringify(config));
+
+        if (loadingMode === "lazy") {
+            hubspotFormCode += lazyLoadingCode(encodedConfig, options, hsScripts);
+        } else if (loadingMode === "eager") {
+            hubspotFormCode += eagerLoadingCode(encodedConfig, hsScripts);
+        } else {
+            hubspotFormCode = `<script charset="utf-8" type="text/javascript" src="${hsScripts.forms.src}"></script><script type="text/javascript">/*<![CDATA[|*/hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')))/*]]>*/</script>`;
+        }
+
+        return hubspotFormCode.replace(/\n/g, '').trim();
     });
 
     eleventyConfig.addShortcode("hubspotMeetings", (url) => {
         if (!url) {
             throw new Error(
-                "[eleventy-plugin-hubspot] URL of hubspotMeeting must be specified"
+                `[eleventy-plugin-hubspot] URL of hubspotMeeting must be specified`
             );
         }
 
