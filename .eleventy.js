@@ -123,7 +123,7 @@ module.exports = (eleventyConfig, options = {}) => {
 
         if (loadingMode === "lazy") {
             _return += `<script type="text/javascript">/*<![CDATA[|*/(function(s,t){t=function(n){n.data==="hsFormsEmbedLoaded"&&(s.removeEventListener("message",t),hbspt.forms.create(JSON.parse(decodeURIComponent("${encodedConfig}"))))},s.addEventListener("message",t)})(window),function(s,t,n,o,e,d){e=new IntersectionObserver(o,n),d=t.querySelector("${options.target}"),e.observe(d)}(window,document,{threshold:.1},function(s,t){if(s[0].isIntersecting){let n="hs-script-${hsScripts.forms.id}",o="${hsScripts.forms.src}";if(!document.getElementById(n)){const e=document.createElement("script");e.id=n,e.src=o,e.defer=!0,e.onload=e.onreadystatechange=function(){(!this.readyState||this.readyState==="loaded"||this.readyState==="complete")&&(e.onload=e.onreadystatechange=null,postMessage("hsFormsEmbedLoaded"))},document.body.appendChild(e)}t.disconnect()}});/*]]>*/</script>`;
-            return _return;
+            return _return.replace(/\n/g, '').trim();
         }
 
         /* Eager loading ****************************************************************************************
@@ -153,13 +153,13 @@ module.exports = (eleventyConfig, options = {}) => {
 
         if (loadingMode === "eager") {
             _return += `<script type="text/javascript">/*<![CDATA[|*/window.addEventListener("message",function(d){d.data==="hsFormsEmbedLoaded"&&hbspt.forms.create(JSON.parse(decodeURIComponent("${encodedConfig}")))},{once:!0}),function(d,o,a,n,e){d.addEventListener("DOMContentLoaded",function(){o.getElementById(a)||(e=o.createElement("script"),e.id=a,e.src=n,e.defer=!0,e.onload=e.onreadystatechange=function(){(!this.readyState||this.readyState==="loaded"||this.readyState==="complete")&&(postMessage("hsFormsEmbedLoaded"),e.onload=e.onreadystatechange=null)},o.body.appendChild(e))})}(window,document,"hs-script-${hsScripts.forms.id}","${hsScripts.forms.src}");/*]]>*/</script>`;
-            return _return;
+            return _return.replace(/\n/g, '').trim();
         }
 
-        return `
-            <script charset="utf-8" type="text/javascript" src="${hsScripts.forms.src}"></script>
-            <script type="text/javascript">/*<![CDATA[|*/hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')))/*]]>*/</script>
-        `;
+        _return = `<script charset="utf-8" type="text/javascript" src="${hsScripts.forms.src}"></script><script type="text/javascript">/*<![CDATA[|*/hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')))/*]]>*/</script>`;
+
+        // always remove new lines and trim the string before returning
+        return _return.replace(/\n/g, '').trim();
     });
 
     eleventyConfig.addShortcode("hubspotMeetings", (url) => {
