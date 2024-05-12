@@ -34,7 +34,7 @@ module.exports = (eleventyConfig, options = {}) => {
         );
     }
 
-    const validURL = (str) => {
+    function validURL(str) {
         const pattern = new RegExp(
             "^(https?:\\/\\/)?" + // protocol
             "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
@@ -46,9 +46,9 @@ module.exports = (eleventyConfig, options = {}) => {
         ); // fragment locator
 
         return pattern.test(str);
-    };
+    }
 
-    function lazyLoadingCode(encodedConfig, options, hsScripts) {
+    const lazyLoadingCode = (encodedConfig, options, hsScripts) => {
         return `<script type="text/javascript">
         /*<![CDATA[|*/
         (function(window, callback){
@@ -86,9 +86,9 @@ module.exports = (eleventyConfig, options = {}) => {
         });
         /*]]>*/
         </script>`;
-    }
+    };
 
-    function eagerLoadingCode(encodedConfig, hsScripts) {
+    const eagerLoadingCode = (encodedConfig, hsScripts) => {
         return `<script type="text/javascript">
         /*<![CDATA[|*/
         window.addEventListener("message", function(messageEvent) {
@@ -115,7 +115,7 @@ module.exports = (eleventyConfig, options = {}) => {
         })(window, document, "hs-script-${hsScripts.forms.id}", "${hsScripts.forms.src}");
         /*]]>*/
         </script>`;
-    }
+    };
 
     eleventyConfig.addShortcode("hubspotForm", (formId, args = {}) => {
         if (!formId) {
