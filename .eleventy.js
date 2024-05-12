@@ -108,8 +108,7 @@ module.exports = (eleventyConfig, options = {}) => {
             w.addEventListener("message", cb);
         })(window);
         ((w, f) => {
-            const e = ["keypress", "click", "scroll", "mousemove", "touchstart"];
-            e.forEach((en) => {
+            ["keypress", "click", "scroll", "mousemove", "touchstart"].forEach((en) => {
                 w.addEventListener(en, function() {
                     if (!f) {
                         f = true;
