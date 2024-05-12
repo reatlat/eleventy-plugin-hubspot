@@ -49,11 +49,72 @@ module.exports = (eleventyConfig, options = {}) => {
     };
 
     function lazyLoadingCode(encodedConfig, options, hsScripts) {
-        return `<script type="text/javascript">/*<![CDATA[|*/(function(s,t){t=function(n){n.data==="hsFormsEmbedLoaded"&&(s.removeEventListener("message",t),hbspt.forms.create(JSON.parse(decodeURIComponent("${encodedConfig}"))))},s.addEventListener("message",t)})(window),function(s,t,n,o,e,d){e=new IntersectionObserver(o,n),d=t.querySelector("${options.target}"),e.observe(d)}(window,document,{threshold:.1},function(s,t){if(s[0].isIntersecting){let n="hs-script-${hsScripts.forms.id}",o="${hsScripts.forms.src}";if(!document.getElementById(n)){const e=document.createElement("script");e.id=n,e.src=o,e.defer=!0,e.onload=e.onreadystatechange=function(){(!this.readyState||this.readyState==="loaded"||this.readyState==="complete")&&(e.onload=e.onreadystatechange=null,postMessage("hsFormsEmbedLoaded"))},document.body.appendChild(e)}t.disconnect()}});/*]]>*/</script>`;
+        return `<script type="text/javascript">
+        /*<![CDATA[|*/
+        (function(window, callback){
+            callback = function(messageEvent) {
+                if (messageEvent.data === "hsFormsEmbedLoaded") {
+                    window.removeEventListener("message", callback);
+                    hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
+                }
+            }
+            window.addEventListener("message", callback);
+        })(window);
+        (function(w,d,options, callback, observer, target) {
+            observer = new IntersectionObserver(callback, options);
+            target = d.querySelector('${options.target}');
+            observer.observe(target);
+        })(window, document, {threshold:0.1}, function(entries, observer) {
+            if (entries[0].isIntersecting) {
+                let scriptID = "hs-script-${hsScripts.forms.id}";
+                let scriptSrc = "${hsScripts.forms.src}";
+                if (!document.getElementById(scriptID)) {
+                    const scriptElement = document.createElement("script");
+                    scriptElement.id = scriptID;
+                    scriptElement.src = scriptSrc;
+                    scriptElement.defer = true;
+                    scriptElement.onload = scriptElement.onreadystatechange = function() {
+                        if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
+                            scriptElement.onload = scriptElement.onreadystatechange = null;
+                            postMessage('hsFormsEmbedLoaded');
+                        }
+                    };
+                    document.body.appendChild(scriptElement);
+                }
+                observer.disconnect()
+            }
+        });
+        /*]]>*/
+        </script>`;
     }
 
     function eagerLoadingCode(encodedConfig, hsScripts) {
-        return `<script type="text/javascript">/*<![CDATA[|*/window.addEventListener("message",function(d){d.data==="hsFormsEmbedLoaded"&&hbspt.forms.create(JSON.parse(decodeURIComponent("${encodedConfig}")))},{once:!0}),function(d,o,a,n,e){d.addEventListener("DOMContentLoaded",function(){o.getElementById(a)||(e=o.createElement("script"),e.id=a,e.src=n,e.defer=!0,e.onload=e.onreadystatechange=function(){(!this.readyState||this.readyState==="loaded"||this.readyState==="complete")&&(postMessage("hsFormsEmbedLoaded"),e.onload=e.onreadystatechange=null)},o.body.appendChild(e))})}(window,document,"hs-script-${hsScripts.forms.id}","${hsScripts.forms.src}");/*]]>*/</script>`;
+        return `<script type="text/javascript">
+        /*<![CDATA[|*/
+        window.addEventListener("message", function(messageEvent) {
+            if (messageEvent.data === "hsFormsEmbedLoaded") {
+                hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
+            }
+        }, {once: true});
+        (function(window, document, scriptID, scriptSrc, scriptElement) {
+            window.addEventListener("DOMContentLoaded", function() {
+                if (!document.getElementById(scriptID)) {
+                    scriptElement = document.createElement("script");
+                    scriptElement.id = scriptID;
+                    scriptElement.src = scriptSrc;
+                    scriptElement.defer = true;
+                    scriptElement.onload = scriptElement.onreadystatechange = function() {
+                        if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
+                            postMessage("hsFormsEmbedLoaded");
+                            scriptElement.onload = scriptElement.onreadystatechange = null;
+                        }
+                    };
+                    document.body.appendChild(scriptElement);
+                }
+            });
+        })(window, document, "hs-script-${hsScripts.forms.id}", "${hsScripts.forms.src}");
+        /*]]>*/
+        </script>`;
     }
 
     eleventyConfig.addShortcode("hubspotForm", (formId, args = {}) => {
