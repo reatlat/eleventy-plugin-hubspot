@@ -77,10 +77,7 @@ and
 into HTML code like this:
 
 ```html
-<!--[if lte IE 8]>
-<script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2-legacy.js"></script>
-<![endif]-->
-<script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/v2.js"></script>
+<script charset="utf-8" type="text/javascript" src="//js.hsforms.net/forms/embed/v2.js"></script>
 <script data-hubspot-rendered="true">hbspt.forms.create({"portalId":1234567,"locale":"en","translations":{"en":{"invalidEmail":"Please enter a valid business email."}},"formId":"e3595481-9ab1-4d00-a98d-1a96a50058ad"});</script>
 ```
 and
@@ -136,7 +133,11 @@ Type legend:
 | onFormSubmit               | O, C  | Callback that executes after form is validated, just before the data is actually sent. This is for any logic that needs to execute during the submit. Any changes will not be validated. Takes the jQuery form object as the argument: onFormSubmit($form). Note: Performing a browser redirect in this callback is not recommended and could prevent the form submission |
 | onFormSubmitted            | O, C  | Callback the data is actually sent.This allows you to perform an action when the submission is fully complete, such as displaying a confirmation or thank you message.                                                                                                                                                                                                    |
 
+### Loading modes
 
+- `default` - The form will load when the page loads (Like you use HubSpot code directly).
+- `eager` - The form will load when DOMContentLoaded event is fired.
+- `lazy` - The form will load when it is in the viewport.
 
 
 ## Contributing
