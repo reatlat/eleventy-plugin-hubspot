@@ -9,8 +9,8 @@ module.exports = function (eleventyConfig) {
         region: "na1",
         portalId: "45442241",
         locale: "en",
-        loadingMode: "eager",
-        // loadingMode: "lazy",
+        // loadingMode: "eager",
+        loadingMode: "lazy",
         //cssRequired: "",
         //cssClass: "",
         translations: {
