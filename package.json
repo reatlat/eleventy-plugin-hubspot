@@ -5,7 +5,7 @@
   "main": ".eleventy.js",
   "scripts": {
     "build": "cd demo/; npx eleventy",
-    "dev": "cd demo/; npx eleventy --serve",
+    "dev": "cd demo/; rm -rf _site/; npx eleventy --serve",
     "test": "cd demo/; npx eleventy"
   },
   "repository": {
