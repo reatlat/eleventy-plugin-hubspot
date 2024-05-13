@@ -107,31 +107,29 @@ module.exports = (eleventyConfig, options = {}) => {
             };
             w.addEventListener("message", cb);
         })(window);
-        ((w, f) => {
-            ["keypress", "click", "scroll", "mousemove", "touchstart"].forEach((en) => {
+        ((w, f, i, s) => {
+            ["keydown", "click", "scroll", "mousemove", "touchstart"].forEach((en) => {
                 w.addEventListener(en, function() {
                     if (!f) {
                         f = true;
                         postMessage("user_first_interaction");
-                        let i = "hs-script-${hsScripts.forms.id}";
-                        let s = "${hsScripts.forms.src}";
                         if (!document.getElementById(i)) {
-                            const se = document.createElement("script");
-                            se.id = i;
-                            se.src = s;
-                            se.defer = true;
-                            se.onload = se.onreadystatechange = function() {
+                            s = document.createElement("script");
+                            s.id = i;
+                            s.src = "${hsScripts.forms.src}";
+                            s.defer = true;
+                            s.onload = s.onreadystatechange = function() {
                                 if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
-                                    se.onload = se.onreadystatechange = null;
+                                    s.onload = s.onreadystatechange = null;
                                     postMessage('hsFormsEmbedLoaded');
                                 }
                             };
-                            document.body.appendChild(se);
+                            document.body.appendChild(s);
                         }
                     }
                 },{once: true});
             })
-        })(window, false);
+        })(window, false, "hs-script-${hsScripts.forms.id}");
         /*]]>*/
         </script>`;
     }
