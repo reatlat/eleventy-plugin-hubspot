@@ -111,7 +111,7 @@ Type legend:
 
 | Attribute                  | Types | Description                                                                                                                                                                                                                                                                                                                                                               |
 |:---------------------------|:-----:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| loadingMode                |   O   | The loading mode for the form. Options are `default`, `eager` and `lazy`. Default is `default`.                                                                                                                                                                                                                                                                           |
+| loadingMode                |   O   | The loading mode for the form. Options are `default`, `eager`, `interact` and `lazy`. Default is `default`.                                                                                                                                                                                                                                                               |
 | portalId                   | R, I  | User's portal ID                                                                                                                                                                                                                                                                                                                                                          |
 | formId                     | R, I  | Unique ID of the form you wish to build                                                                                                                                                                                                                                                                                                                                   |
 | target                     |   O   | jQuery style selector specifying an existing element on the page into which the form will be placed once built. NOTE: If you're including multiple forms on the page, it is strongly recommended that you include a separate, specific target for each form.                                                                                                              |
@@ -137,7 +137,10 @@ Type legend:
 
 - `default` - The form will load when the page loads (Like you use HubSpot code directly).
 - `eager` - The form will load when DOMContentLoaded event is fired.
-- `lazy` - The form will load when it is in the viewport.
+- `interact` - The form will load when the user makes first interaction with the page. (best for performance)
+- `lazy` - The form will load when it is in the viewport. (check the note below)
+
+***Note: if you place HubSpot form below the fold, `lazy` loading mode may have some effect on the form conversion rate, since HubSpot tracking script and form itself will be not loaded on the page until user scrolls to the form.***
 
 
 ## Contributing
