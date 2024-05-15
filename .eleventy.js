@@ -2,7 +2,6 @@
 module.exports = (eleventyConfig, options = {}) => {
 
     const randomUUID = () => {
-
         if (typeof crypto !== 'undefined') {
             return crypto.randomUUID();
         }
