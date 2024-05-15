@@ -1,12 +1,26 @@
 /* global hbspt */
 module.exports = (eleventyConfig, options = {}) => {
+
+    const randomUUID = () => {
+
+        if (typeof crypto !== 'undefined') {
+            return crypto.randomUUID();
+        }
+
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = (Math.random() * 16) | 0;
+            const v = c === 'x' ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
+    }
+
     const hsScripts = {
         forms: {
-            id: crypto.randomUUID(),
+            id: randomUUID(),
             src: "https://js.hsforms.net/forms/embed/v2.js"
         },
         meetings: {
-            id: crypto.randomUUID(),
+            id: randomUUID(),
             src: "https://static.hsappstatic.net/MeetingsEmbed/ex/MeetingsEmbedCode.js"
         }
     };
@@ -170,7 +184,7 @@ module.exports = (eleventyConfig, options = {}) => {
             );
         }
 
-        const uuid = crypto.randomUUID();
+        const uuid = randomUUID();
 
         let hubspotFormCode = ``;
 
