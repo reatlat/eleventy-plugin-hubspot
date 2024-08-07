@@ -1,6 +1,6 @@
 {
   "name": "eleventy-plugin-hubspot",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Capture, organize and engage web visitors with free live chat, forms, CRM (contact management), email marketing, and analytics.",
   "main": ".eleventy.js",
   "scripts": {
