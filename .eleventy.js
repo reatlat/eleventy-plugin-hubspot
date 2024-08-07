@@ -76,7 +76,12 @@ module.exports = (eleventyConfig, options = {}) => {
             cb = function(e) {
                 if (e.data === "hsFormsEmbedLoaded") {
                     w.removeEventListener("message", cb);
-                    hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
+                    const interval = setInterval(function() {
+                        if (typeof hbspt !== 'undefined' && typeof hbspt.forms.create === 'function') {
+                            clearInterval(interval);
+                            hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
+                        }
+                    }, 100);
                 }
             };
             w.addEventListener("message", cb);
@@ -115,7 +120,12 @@ module.exports = (eleventyConfig, options = {}) => {
             cb = function(e) {
                 if (e.data === "hsFormsEmbedLoaded") {
                     w.removeEventListener("message", cb);
-                    hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
+                    const interval = setInterval(function() {
+                        if (typeof hbspt !== 'undefined' && typeof hbspt.forms.create === 'function') {
+                            clearInterval(interval);
+                            hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
+                        }
+                    }, 100);
                 }
             };
             w.addEventListener("message", cb);
@@ -152,7 +162,12 @@ module.exports = (eleventyConfig, options = {}) => {
         /*<![CDATA[|*/
         window.addEventListener("message", function(e) {
             if (e.data === "hsFormsEmbedLoaded") {
-                hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
+                const interval = setInterval(function() {
+                    if (typeof hbspt !== 'undefined' && typeof hbspt.forms.create === 'function') {
+                        clearInterval(interval);
+                        hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
+                    }
+                }, 100);
             }
         }, {once: true});
         (function(w,d,id,s) {
