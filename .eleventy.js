@@ -47,6 +47,14 @@ module.exports = (eleventyConfig, options = {}) => {
         );
     }
 
+    // default options
+    options = {
+        ...{
+            loadingSpinner: `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="36" height="36" style="margin: 2rem auto; shape-rendering: auto; display: block; background: rgba(255, 255, 255, 0);" xmlns:xlink="http://www.w3.org/1999/xlink"><g><circle fill="none" stroke-width="12" stroke="#7fd1de" r="36" cy="50" cx="50"></circle><circle fill="none" stroke-linecap="square" stroke-width="12" stroke="#05a6be" r="36" cy="50" cx="50"><animateTransform keyTimes="0;0.5;1" values="0 50 50;180 50 50;720 50 50" dur="1.408450704225352s" repeatCount="indefinite" type="rotate" attributeName="transform"></animateTransform><animate keyTimes="0;0.5;1" values="11.309733552923255 214.88493750554184;113.09733552923255 113.09733552923255;11.309733552923255 214.88493750554184" dur="1.408450704225352s" repeatCount="indefinite" attributeName="stroke-dasharray"></animate></circle><g></g></g></svg>`,
+        },
+        ...options
+    };
+
     const minifyCode = (code) => {
         return code
             .split('\n') // split on new line
@@ -77,7 +85,7 @@ module.exports = (eleventyConfig, options = {}) => {
                 if (e.data === "hsFormsEmbedLoaded") {
                     w.removeEventListener("message", cb);
                     const interval = setInterval(function() {
-                        if (typeof hbspt !== 'undefined' && typeof hbspt.forms.create === 'function') {
+                        if (hbspt?.forms?.create && typeof hbspt.forms.create === 'function') {
                             clearInterval(interval);
                             hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
                         }
@@ -92,19 +100,14 @@ module.exports = (eleventyConfig, options = {}) => {
             observer.observe(target);
         })(window, document, {threshold:0.1}, function(entries, observer) {
             if (entries[0].isIntersecting) {
-                let scriptID = "hs-script-${hsScripts.forms.id}";
-                if (!document.getElementById(scriptID)) {
+                if ( !document.querySelector('[src="${hsScripts.forms.src}"]') ) {
                     const s = document.createElement("script");
-                    s.id = scriptID;
                     s.src = "${hsScripts.forms.src}";
                     s.defer = true;
-                    s.onload = s.onreadystatechange = function() {
-                        if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
-                            s.onload = s.onreadystatechange = null;
-                            postMessage('hsFormsEmbedLoaded');
-                        }
-                    };
+                    s.onload = postMessage('hsFormsEmbedLoaded');
                     document.body.appendChild(s);
+                } else {
+                    postMessage('hsFormsEmbedLoaded');
                 }
                 observer.disconnect()
             }
@@ -121,7 +124,7 @@ module.exports = (eleventyConfig, options = {}) => {
                 if (e.data === "hsFormsEmbedLoaded") {
                     w.removeEventListener("message", cb);
                     const interval = setInterval(function() {
-                        if (typeof hbspt !== 'undefined' && typeof hbspt.forms.create === 'function') {
+                        if (hbspt?.forms?.create && typeof hbspt.forms.create === 'function') {
                             clearInterval(interval);
                             hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
                         }
@@ -130,29 +133,25 @@ module.exports = (eleventyConfig, options = {}) => {
             };
             w.addEventListener("message", cb);
         })(window);
-        ((w, f, i, s) => {
+        ((w, d, f, s) => {
             ["keydown", "click", "scroll", "mousemove", "touchstart"].forEach((en) => {
                 w.addEventListener(en, function() {
                     if (!f) {
                         f = true;
                         postMessage("user_first_interaction");
-                        if (!document.getElementById(i)) {
-                            s = document.createElement("script");
-                            s.id = i;
+                        if ( !d.querySelector('[src="${hsScripts.forms.src}"]') ) {
+                            s = d.createElement("script");
                             s.src = "${hsScripts.forms.src}";
                             s.defer = true;
-                            s.onload = s.onreadystatechange = function() {
-                                if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
-                                    s.onload = s.onreadystatechange = null;
-                                    postMessage('hsFormsEmbedLoaded');
-                                }
-                            };
-                            document.body.appendChild(s);
+                            s.onload = postMessage('hsFormsEmbedLoaded');
+                            d.body.appendChild(s);
+                        } else {
+                            postMessage('hsFormsEmbedLoaded');
                         }
                     }
                 },{once: true});
             })
-        })(window, false, "hs-script-${hsScripts.forms.id}");
+        })(window, document, false);
         /*]]>*/
         </script>`;
     }
@@ -163,30 +162,26 @@ module.exports = (eleventyConfig, options = {}) => {
         window.addEventListener("message", function(e) {
             if (e.data === "hsFormsEmbedLoaded") {
                 const interval = setInterval(function() {
-                    if (typeof hbspt !== 'undefined' && typeof hbspt.forms.create === 'function') {
+                    if (hbspt?.forms?.create && typeof hbspt.forms.create === 'function') {
                         clearInterval(interval);
                         hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
                     }
                 }, 100);
             }
         }, {once: true});
-        (function(w,d,id,s) {
+        (function(w, d, s) {
             w.addEventListener("DOMContentLoaded", function() {
-                if (!d.getElementById(id)) {
+                if ( !d.querySelector('[src="${hsScripts.forms.src}"]') ) {
                     s = d.createElement("script");
-                    s.id = id;
                     s.src = "${hsScripts.forms.src}";
                     s.defer = true;
-                    s.onload = s.onreadystatechange = function() {
-                        if (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") {
-                            postMessage("hsFormsEmbedLoaded");
-                            s.onload = s.onreadystatechange = null;
-                        }
-                    };
+                    s.onload = postMessage("hsFormsEmbedLoaded");
                     d.body.appendChild(s);
+                } else {
+                    postMessage("hsFormsEmbedLoaded");
                 }
             });
-        })(window, document, "hs-script-${hsScripts.forms.id}");
+        })(window, document);
         /*]]>*/
         </script>`;
     }
@@ -204,7 +199,11 @@ module.exports = (eleventyConfig, options = {}) => {
 
         if (['eager', 'lazy', 'interact'].includes(loadingMode) && !args.target) {
             options.target = `#form-wrapper-${uuid}`;
-            hubspotFormCode += `<div id="form-wrapper-${uuid}"></div>`;
+            hubspotFormCode += `<div id="form-wrapper-${uuid}">`;
+            if (options.loadingSpinner) {
+                hubspotFormCode += minifyCode(options.loadingSpinner);
+            }
+            hubspotFormCode += `</div>`;
         }
 
         const config = { ...options, formId, ...args };
