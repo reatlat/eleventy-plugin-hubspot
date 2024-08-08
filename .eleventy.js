@@ -202,6 +202,7 @@ module.exports = (eleventyConfig, options = {}) => {
             hubspotFormCode += `<div id="form-wrapper-${uuid}">`;
             if (options.loadingSpinner) {
                 hubspotFormCode += minifyCode(options.loadingSpinner);
+                delete options.loadingSpinner;
             }
             hubspotFormCode += `</div>`;
         }
