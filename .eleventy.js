@@ -50,10 +50,13 @@ module.exports = (eleventyConfig, options = {}) => {
     // default options
     options = {
         ...{
-            loadingSpinner: `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="36" height="36" style="margin: 2rem auto; shape-rendering: auto; display: block; background: rgba(255, 255, 255, 0);" xmlns:xlink="http://www.w3.org/1999/xlink"><g><circle fill="none" stroke-width="12" stroke="#7fd1de" r="36" cy="50" cx="50"></circle><circle fill="none" stroke-linecap="square" stroke-width="12" stroke="#05a6be" r="36" cy="50" cx="50"><animateTransform keyTimes="0;0.5;1" values="0 50 50;180 50 50;720 50 50" dur="1.408450704225352s" repeatCount="indefinite" type="rotate" attributeName="transform"></animateTransform><animate keyTimes="0;0.5;1" values="11.309733552923255 214.88493750554184;113.09733552923255 113.09733552923255;11.309733552923255 214.88493750554184" dur="1.408450704225352s" repeatCount="indefinite" attributeName="stroke-dasharray"></animate></circle><g></g></g></svg>`,
+            loadingSpinner: `<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" width="36" height="36" style="margin: 2rem auto; shape-rendering: auto; display: block; background: rgba(255, 255, 255, 0);" xmlns:xlink="http://www.w3.org/1999/xlink"><g><circle fill="none" stroke-width="8" stroke="#b7ebec" r="36" cy="50" cx="50"></circle><circle fill="none" stroke-linecap="square" stroke-width="8" stroke="#05a6be" r="36" cy="50" cx="50"><animateTransform keyTimes="0;0.5;1" values="0 50 50;180 50 50;720 50 50" dur="1.408450704225352s" repeatCount="indefinite" type="rotate" attributeName="transform"></animateTransform><animate keyTimes="0;0.5;1" values="11.309733552923255 214.88493750554184;113.09733552923255 113.09733552923255;11.309733552923255 214.88493750554184" dur="1.408450704225352s" repeatCount="indefinite" attributeName="stroke-dasharray"></animate></circle><g></g></g></svg>`,
         },
         ...options
     };
+
+    const loadingSpinner = options.loadingSpinner;
+    delete options.loadingSpinner;
 
     const minifyCode = (code) => {
         return code
@@ -200,9 +203,8 @@ module.exports = (eleventyConfig, options = {}) => {
         if (['eager', 'lazy', 'interact'].includes(loadingMode) && !args.target) {
             options.target = `#form-wrapper-${uuid}`;
             hubspotFormCode += `<div id="form-wrapper-${uuid}">`;
-            if (options.loadingSpinner) {
-                hubspotFormCode += minifyCode(options.loadingSpinner);
-                delete options.loadingSpinner;
+            if (loadingSpinner) {
+                hubspotFormCode += minifyCode(loadingSpinner);
             }
             hubspotFormCode += `</div>`;
         }
