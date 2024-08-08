@@ -24,6 +24,11 @@ permalink: /lazy/
             border: none;
         }
     </style>
+    <script>
+        window.addEventListener("message", function(event) {
+            console.log("Message received from parent: ", event.data);
+        });
+    </script>
 </head>
 <body>
 
