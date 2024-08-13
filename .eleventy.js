@@ -88,7 +88,7 @@ module.exports = (eleventyConfig, options = {}) => {
                 if (e.data === "hsFormsEmbedLoaded") {
                     w.removeEventListener("message", cb);
                     const interval = setInterval(function() {
-                        if (hbspt?.forms?.create && typeof hbspt.forms.create === 'function') {
+                        if ( typeof ((hbspt||{}).forms||{}).create === 'function' ) {
                             clearInterval(interval);
                             hbspt.forms.create(JSON.parse(decodeURIComponent('${encodedConfig}')));
                         }
