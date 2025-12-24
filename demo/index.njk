@@ -31,10 +31,13 @@
 </head>
 <body class="py-14 px-8">
 <script>
-// Demo page: prevent submissions and destroy ALL cookies
+// Demo page: prevent submissions and destroy ALL tracking
 (function() {
-    // Nuclear option: destroy ALL cookies every 3 seconds
-    function destroyAllCookies() {
+    // Nuclear option: destroy ALL cookies and storage every 3 seconds
+    function destroyAllTracking() {
+        // Clear all storage
+        try { localStorage.clear(); } catch(e) {}
+        try { sessionStorage.clear(); } catch(e) {}
         var cookies = document.cookie.split(';');
         for (var i = 0; i < cookies.length; i++) {
             var cookie = cookies[i];
@@ -54,8 +57,8 @@
             });
         }
     }
-    destroyAllCookies();
-    setInterval(destroyAllCookies, 3000);
+    destroyAllTracking();
+    setInterval(destroyAllTracking, 3000);
 
     document.addEventListener('DOMContentLoaded', function() {
         // Intercept form submissions
@@ -174,7 +177,12 @@ module.exports = function (eleventyConfig) {
     <p><a href="https://github.com/reatlat/eleventy-plugin-hubspot/blob/main/LICENSE">MIT License</a></p>
     <hr>
     <footer>
-        <p class="text-sm text-gray-500 mb-4"><strong>Cookie Notice:</strong> This demo page does not track you. Any cookies that may be set by embedded HubSpot widgets are automatically destroyed every 3 seconds to protect your privacy.</p>
+        <div class="text-sm text-gray-500 mb-4">
+            <p><strong>Privacy Notice:</strong> This demo page automatically destroys all cookies, localStorage, and sessionStorage on our domain every 3 seconds.</p>
+            <p class="mt-2"><strong>Third-party cookies:</strong> The embedded HubSpot widgets (forms and meetings) may set cookies on <code>app.hubspot.com</code> and <code>meetings.hubspot.com</code>. Due to browser security policies, we cannot clear these third-party cookies via JavaScript.</p>
+            <p class="mt-2"><strong>How to block:</strong> Most modern browsers block third-party cookies by default. You can also enable strict tracking protection in your browser settings (Chrome: Settings → Privacy → Cookies; Firefox: Settings → Privacy → Enhanced Tracking Protection; Safari: blocks by default).</p>
+            <p class="mt-2"><strong>How to clear:</strong> Open DevTools (F12) → Application tab → Cookies → right-click each domain → Clear.</p>
+        </div>
         <p>Built using <a href="https://11ty.dev?utm_source=eleventy-plugin-hubspot">{{ eleventy.generator }}</a>.</p>
         <p>Crafted by <a href="https://alex.zappa.dev?utm_source=eleventy-plugin-hubspot">Alex Zappa</a> at <a href="https://freshjuice.dev?utm_source=eleventy-plugin-hubspot">FreshJuice</a>.</p>
     </footer>
