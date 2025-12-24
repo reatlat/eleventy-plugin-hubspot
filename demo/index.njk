@@ -31,23 +31,38 @@
 </head>
 <body class="py-14 px-8">
 <script>
-// Prevent form submissions on demo page
-document.addEventListener('DOMContentLoaded', function() {
-    // Intercept all form submissions
-    document.addEventListener('submit', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        alert('This is a demo page. Form submissions are disabled.');
-        return false;
-    }, true);
+// Demo page: prevent submissions and clear first-party HubSpot cookies
+(function() {
+    // Clear all HubSpot first-party cookies (cannot clear third-party cookies from hubspot.com)
+    function clearHsCookies() {
+        document.cookie.split(';').forEach(function(c) {
+            var name = c.trim().split('=')[0];
+            if (/^(__hs|_hs|hubspot|hs_|messagesUtk|__hstc|__hssc|__hssrc)/i.test(name)) {
+                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=' + location.hostname;
+                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+            }
+        });
+    }
+    clearHsCookies();
+    setInterval(clearHsCookies, 3000);
 
-    // Block HubSpot form submissions via message interception
-    window.addEventListener('message', function(e) {
-        if (e.data && typeof e.data === 'object' && e.data.type === 'hsFormCallback' && e.data.eventName === 'onFormSubmit') {
-            e.stopImmediatePropagation();
-        }
-    }, true);
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        // Intercept form submissions
+        document.addEventListener('submit', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert('This is a demo page. Form submissions are disabled.');
+            return false;
+        }, true);
+
+        // Block HubSpot form callbacks
+        window.addEventListener('message', function(e) {
+            if (e.data && typeof e.data === 'object' && e.data.type === 'hsFormCallback' && e.data.eventName === 'onFormSubmit') {
+                e.stopImmediatePropagation();
+            }
+        }, true);
+    });
+})();
 </script>
 <div class="prose mx-auto">
     <h1 class="!mb-0">11ty Plugin: HubSpot</h1>
