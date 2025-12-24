@@ -3,6 +3,8 @@
 [![npm](https://img.shields.io/npm/dt/eleventy-plugin-hubspot.svg)](https://npmjs.com/package/eleventy-plugin-hubspot)
 [![license](https://img.shields.io/npm/l/eleventy-plugin-hubspot.svg)](https://npmjs.com/package/eleventy-plugin-hubspot)
 
+**[Live Demo](https://eleventy-plugin-hubspot.netlify.app/)**
+
 An Eleventy [shortcode](https://www.11ty.dev/docs/shortcodes/) that generates HubSpot forms or Meetings Calendar.
 
 ## Installation
@@ -15,6 +17,18 @@ npm install eleventy-plugin-hubspot --save-dev
 
 Add it to your [Eleventy Config](https://www.11ty.dev/docs/config/) file:
 
+**ESM (Eleventy 3.x+):**
+```js
+import eleventyPluginHubspot from 'eleventy-plugin-hubspot';
+
+export default function (eleventyConfig) {
+    eleventyConfig.addPlugin(eleventyPluginHubspot, {
+        portalId: 1234567
+    });
+}
+```
+
+**CommonJS (Eleventy 2.x):**
 ```js
 const eleventyPluginHubspot = require('eleventy-plugin-hubspot');
 
@@ -32,15 +46,18 @@ Advanced usage:
 - [How to customize the form embed code (HubSpot's Knowledge Base)](https://legacydocs.hubspot.com/docs/methods/forms/advanced_form_options)
 
 ```js
-const eleventyPluginHubspot = require('eleventy-plugin-hubspot');
+import eleventyPluginHubspot from 'eleventy-plugin-hubspot';
 
-module.exports = function (eleventyConfig) {
+export default function (eleventyConfig) {
     eleventyConfig.addPlugin(eleventyPluginHubspot, {
         portalId: 1234567,
         locale: "en",
-        loadingMode: "default",
+        loadingMode: "interact",
         cssRequired: "",
         cssClass: "",
+        scriptAttributes: {
+            "data-ot-ignore": "true"  // OneTrust bypass
+        },
         translations: {
             en: {
                 invalidEmail: "Please enter a valid business email."
@@ -59,7 +76,7 @@ module.exports = function (eleventyConfig) {
             console.log('onFormSubmitted formID:', $form.data.id);
         }
     });
-};
+}
 ```
 
 
@@ -113,6 +130,7 @@ Type legend:
 |:---------------------------|:-----:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | loadingMode                |   O   | The loading mode for the form. Options are `default`, `eager`, `interact` and `lazy`. Default is `default`.                                                                                                                                                                                                                                                                |
 | loadingSpinner             |   O   | Show a loading spinner while the form is loading. Defaults to inline built-in spinner. Could be set to `false` to disable the spinner, or a custom spinner HTML.                                                                                                                                                                                                           |
+| scriptAttributes           |   O   | Object of custom attributes to add to the HubSpot script tag. Useful for cookie consent tools like OneTrust (e.g., `{ "data-ot-ignore": "true" }`).                                                                                                                                                                                                                        |
 | portalId                   | R, I  | User's portal ID                                                                                                                                                                                                                                                                                                                                                           |
 | formId                     | R, I  | Unique ID of the form you wish to build                                                                                                                                                                                                                                                                                                                                    |
 | target                     |   O   | jQuery style selector specifying an existing element on the page into which the form will be placed once built. NOTE: If you're including multiple forms on the page, it is strongly recommended that you include a separate, specific target for each form.                                                                                                               |
@@ -142,6 +160,33 @@ Type legend:
 - `lazy` - The form will load when it is in the viewport. (check the note below)
 
 ***Note: if you place HubSpot form below the fold, `lazy` loading mode may have some effect on the form conversion rate, since HubSpot tracking script and form itself will be not loaded on the page until user scrolls to the form.***
+
+
+### Cookie Consent Bypass
+
+If you're using a cookie consent management platform like **OneTrust**, **Cookiebot**, or similar, the HubSpot scripts may be blocked until the user consents. The `scriptAttributes` option allows you to add custom attributes to bypass this blocking for essential functionality.
+
+**OneTrust example:**
+```js
+eleventyConfig.addPlugin(eleventyPluginHubspot, {
+    portalId: 1234567,
+    scriptAttributes: {
+        "data-ot-ignore": "true"
+    }
+});
+```
+
+**Cookiebot example:**
+```js
+eleventyConfig.addPlugin(eleventyPluginHubspot, {
+    portalId: 1234567,
+    scriptAttributes: {
+        "data-cookieconsent": "ignore"
+    }
+});
+```
+
+**Note:** Use this feature responsibly. Make sure bypassing consent aligns with your privacy policy and applicable regulations (GDPR, CCPA, etc.).
 
 
 ## Contributing

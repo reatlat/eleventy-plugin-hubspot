@@ -4,64 +4,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>11ty Plugin HubSpot - Demo</title>
-    <link rel="stylesheet"
-          href="https://unpkg.com/purecss@2.1.0/build/pure-min.css"
-          integrity="sha384-yHIFVG6ClnONEA5yB5DJXfW2/KC173DIQrYoZMEtBvGzmf0PKiGyNEqe9N6BNDBH"
-          crossorigin="anonymous">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>11ty Plugin HubSpot</title>
+    <meta name="description" content="Capture, organize and engage web visitors with free live chat, forms, CRM, email marketing, and analytics.">
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.3/gh-fork-ribbon.min.css" />
     <style>
-        body {
-            background: #fafafa;
+        .github-fork-ribbon:before { background-color: #333; }
+        .prose :where(code):not(:where([class~="not-prose"],[class~="not-prose"] *))::before,
+        .prose :where(code):not(:where([class~="not-prose"],[class~="not-prose"] *))::after { content: none !important; }
+        .prose :where(code):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
+            background-color: #f5f2f0;
+            padding: 0.05em 0.4em;
+            line-height: 1;
+            font-size: inherit !important;
+            border-radius: 0.2em;
+            border: 1px solid #e1e1e1;
+            display: inline !important;
+            font-family: 'Fira Code', 'Courier New', monospace;
         }
-        .page-wrapper {
-            background: #fff;
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,.15);
-        }
-        fieldset {
-            border: none;
+        .prose {
+            --tw-prose-body: #111 !important;
         }
     </style>
 </head>
-<body>
-    <div class="page page-wrapper">
+<body class="py-14 px-8">
+<script>
+// Prevent form submissions on demo page
+document.addEventListener('DOMContentLoaded', function() {
+    // Intercept all form submissions
+    document.addEventListener('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        alert('This is a demo page. Form submissions are disabled.');
+        return false;
+    }, true);
 
-        <div class="content-wrapper">
-            <div class="content">
-                <div class="pure-g">
-                    <div class="pure-u-1-1">
+    // Block HubSpot form submissions via message interception
+    window.addEventListener('message', function(e) {
+        if (e.data && typeof e.data === 'object' && e.data.type === 'hsFormCallback' && e.data.eventName === 'onFormSubmit') {
+            e.stopImmediatePropagation();
+        }
+    }, true);
+});
+</script>
+<div class="prose mx-auto">
+    <h1 class="!mb-0">11ty Plugin: HubSpot</h1>
+    <p class="mt-4 flex flex-wrap gap-2">
+        <a href="https://npmjs.com/package/eleventy-plugin-hubspot">
+            <span class="sr-only">npm</span>
+            <img class="inline-block !my-0" src="https://img.shields.io/npm/v/eleventy-plugin-hubspot.svg" alt="npm">
+        </a>
+        <a href="https://npmjs.com/package/eleventy-plugin-hubspot">
+            <span class="sr-only">npm</span>
+            <img class="inline-block !my-0" src="https://img.shields.io/npm/dt/eleventy-plugin-hubspot.svg" alt="npm">
+        </a>
+        <a href="https://npmjs.com/package/eleventy-plugin-hubspot">
+            <span class="sr-only">license</span>
+            <img class="inline-block !my-0" src="https://img.shields.io/npm/l/eleventy-plugin-hubspot.svg" alt="license">
+        </a>
+    </p>
+    <p><a href="https://www.npmjs.com/package/eleventy-plugin-hubspot">This plugin</a> adds shortcodes to your Eleventy project to easily embed <a href="https://www.hubspot.com/">HubSpot</a> forms and meetings calendars.</p>
 
-                        {% hubspotForm "f4e72b0a-fbd9-4ab3-938d-debdbdb7ea6e", {
-                            locale: "es"
-                        } %}
+    <h2>Installation</h2>
+    <p>Install the plugin from npm:</p>
+    <pre><code>npm install eleventy-plugin-hubspot --save-dev</code></pre>
 
+    <h2>Configuration</h2>
+    <p>Add it to your <a href="https://www.11ty.dev/docs/config/">Eleventy Config</a> file:</p>
+    <h3>ESM (Eleventy 3.x+)</h3>
+    <pre><code>import eleventyPluginHubspot from 'eleventy-plugin-hubspot';
 
-                        {% hubspotForm "82b488a3-4a86-4f03-9e45-02f7d82c23ea", {
-                            locale: "es"
-                        } %}
+export default function (eleventyConfig) {
+    eleventyConfig.addPlugin(eleventyPluginHubspot, {
+        portalId: 1234567
+    });
+}</code></pre>
+    <h3>CommonJS (Eleventy 2.x)</h3>
+    <pre><code>const eleventyPluginHubspot = require('eleventy-plugin-hubspot');
 
+module.exports = function (eleventyConfig) {
+    eleventyConfig.addPlugin(eleventyPluginHubspot, {
+        portalId: 1234567
+    });
+};</code></pre>
 
-                        {% hubspotForm "160a18ba-dd02-4194-9da6-095ccee2ba87", {
-                            locale: "es"
-                        } %}
+    <h2>Options</h2>
+    <ul>
+        <li><code>portalId</code> - <strong>(required)</strong> Your HubSpot portal ID</li>
+        <li><code>loadingMode</code> - Loading strategy: <code>default</code>, <code>eager</code>, <code>interact</code>, or <code>lazy</code><br/><small>Default: <code>default</code></small></li>
+        <li><code>loadingSpinner</code> - Custom spinner HTML or <code>false</code> to disable<br/><small>Default: built-in SVG spinner</small></li>
+        <li><code>scriptAttributes</code> - Object of custom attributes for the HubSpot script tag (e.g., OneTrust bypass)<br/><small>Default: <code>{}</code></small></li>
+        <li><code>locale</code> - Form language locale<br/><small>Default: <code>undefined</code></small></li>
+    </ul>
 
+    <h3>Loading Modes</h3>
+    <ul>
+        <li><code>default</code> - Form loads immediately with the page</li>
+        <li><code>eager</code> - Form loads on <code>DOMContentLoaded</code></li>
+        <li><code>interact</code> - Form loads on first user interaction (best for performance)</li>
+        <li><code>lazy</code> - Form loads when scrolled into viewport</li>
+    </ul>
 
-                        {# TODO findout how to pass event callback functions like onBeforeFormInit #}
+    <h2>Usage</h2>
+    <h3>HubSpot Forms</h3>
+    <pre><code>{% raw %}{% hubspotForm "your-form-id" %}
 
-                        {% hubspotMeetings "https://meetings.hubspot.com/alex-zappa" %}
+{# With options #}
+{% hubspotForm "your-form-id", { locale: "es" } %}{% endraw %}</code></pre>
 
+    <h3>HubSpot Meetings</h3>
+    <pre><code>{% raw %}{% hubspotMeetings "https://meetings.hubspot.com/your-meeting-link" %}{% endraw %}</code></pre>
 
-                        {% hubspotForm "f4e72b0a-fbd9-4ab3-938d-debdbdb7ea6e", {
-                            locale: "es"
-                        } %}
+    <h2>Demo</h2>
+    <p>Below are live HubSpot forms using the <code>lazy</code> loading mode with <code>scriptAttributes: { "data-ot-ignore": "true" }</code> for OneTrust bypass.</p>
 
-                    </div>
-                </div>
-            </div>
-        </div>
-
+    <h3>Form Example</h3>
+    <div class="not-prose border border-gray-200 rounded-lg p-4 bg-gray-50">
+        {% hubspotForm "f4e72b0a-fbd9-4ab3-938d-debdbdb7ea6e", { locale: "en" } %}
     </div>
+
+    <h3>Meetings Example</h3>
+</div>
+<div class="max-w-4xl mx-auto px-4">
+    <div class="not-prose border border-gray-200 rounded-lg p-4 bg-gray-50">
+        {% hubspotMeetings "https://meetings.hubspot.com/alex-zappa" %}
+    </div>
+</div>
+<div class="prose mx-auto">
+
+    <h2>Advanced: OneTrust / Cookie Consent Bypass</h2>
+    <pre><code>eleventyConfig.addPlugin(eleventyPluginHubspot, {
+    portalId: 1234567,
+    loadingMode: "interact",
+    scriptAttributes: {
+        "data-ot-ignore": "true",
+        "data-cookieconsent": "ignore"
+    }
+});</code></pre>
+
+    <h2>License</h2>
+    <p><a href="https://github.com/reatlat/eleventy-plugin-hubspot/blob/main/LICENSE">MIT License</a></p>
+    <hr>
+    <footer>
+        <p>Built using <a href="https://11ty.dev?utm_source=eleventy-plugin-hubspot">{{ eleventy.generator }}</a>.</p>
+        <p>Crafted by <a href="https://alex.zappa.dev?utm_source=eleventy-plugin-hubspot">Alex Zappa</a> at <a href="https://freshjuice.dev?utm_source=eleventy-plugin-hubspot">FreshJuice</a>.</p>
+    </footer>
+</div>
+<a class="github-fork-ribbon fixed" href="https://github.com/reatlat/eleventy-plugin-hubspot/" data-ribbon="Fork me on GitHub" title="Fork me on GitHub">Fork me on GitHub</a>
+
 </body>
 </html>

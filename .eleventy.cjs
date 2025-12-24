@@ -1,5 +1,5 @@
 /* global hbspt */
-export default (eleventyConfig, options = {}) => {
+module.exports = (eleventyConfig, options = {}) => {
 
     const randomUUID = () => {
         if (typeof crypto !== 'undefined') {

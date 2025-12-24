@@ -1,6 +1,6 @@
-const eleventyPluginHubspot = require("../.eleventy.js");
+import eleventyPluginHubspot from "../.eleventy.js";
 
-module.exports = function (eleventyConfig) {
+export default function (eleventyConfig) {
     /**
      * How to customize the form embed code
      * @link https://legacydocs.hubspot.com/docs/methods/forms/advanced_form_options
@@ -10,14 +10,17 @@ module.exports = function (eleventyConfig) {
         portalId: "45442241",
         locale: "en",
         // loadingMode: "eager",
-        loadingMode: "interact",
-        // loadingMode: "lazy",
+        // loadingMode: "interact",
+        loadingMode: "lazy",
         //cssRequired: "",
         //cssClass: "",
+        scriptAttributes: {
+            "data-ot-ignore": "true",
+        },
         translations: {
             en: {
                 invalidEmail: "Please enter a valid business email."
             },
         },
     });
-};
+}
