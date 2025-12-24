@@ -31,20 +31,31 @@
 </head>
 <body class="py-14 px-8">
 <script>
-// Demo page: prevent submissions and clear first-party HubSpot cookies
+// Demo page: prevent submissions and destroy ALL cookies
 (function() {
-    // Clear all HubSpot first-party cookies (cannot clear third-party cookies from hubspot.com)
-    function clearHsCookies() {
-        document.cookie.split(';').forEach(function(c) {
-            var name = c.trim().split('=')[0];
-            if (/^(__hs|_hs|hubspot|hs_|messagesUtk|__hstc|__hssc|__hssrc)/i.test(name)) {
-                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=' + location.hostname;
-                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
-            }
-        });
+    // Nuclear option: destroy ALL cookies every 3 seconds
+    function destroyAllCookies() {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i];
+            var name = cookie.split('=')[0].trim();
+            if (!name) continue;
+            // Try all possible domain/path combinations
+            var domains = [location.hostname, '.' + location.hostname, ''];
+            var paths = ['/', '', location.pathname];
+            domains.forEach(function(domain) {
+                paths.forEach(function(path) {
+                    var del = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                    if (path) del += ';path=' + path;
+                    if (domain) del += ';domain=' + domain;
+                    document.cookie = del;
+                    document.cookie = del + ';secure';
+                });
+            });
+        }
     }
-    clearHsCookies();
-    setInterval(clearHsCookies, 3000);
+    destroyAllCookies();
+    setInterval(destroyAllCookies, 3000);
 
     document.addEventListener('DOMContentLoaded', function() {
         // Intercept form submissions
@@ -163,7 +174,7 @@ module.exports = function (eleventyConfig) {
     <p><a href="https://github.com/reatlat/eleventy-plugin-hubspot/blob/main/LICENSE">MIT License</a></p>
     <hr>
     <footer>
-        <p class="text-sm text-gray-500 mb-4"><strong>Cookie Notice:</strong> This demo page does not intentionally track you or set any cookies. However, the embedded HubSpot forms and meetings widgets may set cookies for functionality purposes. To protect your privacy, this demo automatically clears any first-party HubSpot cookies every few seconds to prevent cross-page tracking.</p>
+        <p class="text-sm text-gray-500 mb-4"><strong>Cookie Notice:</strong> This demo page does not track you. Any cookies that may be set by embedded HubSpot widgets are automatically destroyed every 3 seconds to protect your privacy.</p>
         <p>Built using <a href="https://11ty.dev?utm_source=eleventy-plugin-hubspot">{{ eleventy.generator }}</a>.</p>
         <p>Crafted by <a href="https://alex.zappa.dev?utm_source=eleventy-plugin-hubspot">Alex Zappa</a> at <a href="https://freshjuice.dev?utm_source=eleventy-plugin-hubspot">FreshJuice</a>.</p>
     </footer>
